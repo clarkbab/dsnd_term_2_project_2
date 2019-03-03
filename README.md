@@ -20,7 +20,16 @@ $ python models/train_classifier.py data/DisasterResponse.db models/classifier.p
 There is also a web application that can predict message categories, run it with:
 
 ```
-$ python app/run.py
+$ cd app
+$ python run.py
 ```
 
 And view the application by visiting `localhost:3001` from your browser.
+
+### Files
+
+The `app` folder contains all the content for running the web application. It reads the model from the `models/classifier.pkl` file.
+
+The `data` folder contains our unprocessed CSVs and processed DB files as well as the script to clean the data.
+
+The `models` folders trains a new classifier on the cleaned data in the `data/DisasterResponse.db` SQLite database and saves the resulting model to `models/classifier.pkl`.

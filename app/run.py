@@ -2,6 +2,7 @@ import json
 import plotly
 import pandas as pd
 import nltk
+import re
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -12,18 +13,24 @@ from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
-app = Flask(__name__)
-
 def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
+    """Splits a sentence into tokens.
 
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
+    Arguments:
+        text - the sentence.
+    """
+    # Convert to lower case.
+    text = text.lower()
 
-    return clean_tokens
+    # Remove non-alphanumeric characters.
+    text = re.sub(r'[^a-z0-9]', ' ', text)
+
+    # Split into tokens.
+    tokens = text.split()
+    
+    return tokens
+
+app = Flask(__name__)
 
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
@@ -41,10 +48,32 @@ def index():
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+
+    # Work out the percentage of samples in each category.
+    category_perc = df.sum(numeric_only=True)[1:6] / df.shape[0]
+    category_names = list(category_perc.index)
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
+        {
+            'data': [
+                Bar(
+                    x=category_names,
+                    y=category_perc
+                )
+            ],
+
+            'layout': {
+                'title': 'Top 5 Categories',
+                'yaxis': {
+                    'title': "Percentage of Samples"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
+        },
         {
             'data': [
                 Bar(
