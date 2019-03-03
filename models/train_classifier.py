@@ -13,6 +13,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 
 def load_data(database_filepath):
+    """Loads the data from a database into features and targets.
+
+    Arguments:
+        database_filepath - the database file.
+    """
     # Load data from the database.
     engine = create_engine(f"sqlite:///{database_filepath}")
     conn = engine.connect()
@@ -27,6 +32,11 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """Splits a sentence into tokens.
+
+    Arguments:
+        text - the sentence.
+    """
     # Convert to lower case.
     text = text.lower()
 
@@ -39,6 +49,8 @@ def tokenize(text):
     return tokens
 
 def build_model():
+    """Builds the classifier.
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -49,6 +61,14 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """Evaluates the classifier's performance on the test data.
+
+    Arguments:
+        model -- the classifier.
+        X_test -- the test features.
+        Y_test -- the test targets.
+        category_names -- the target classes.
+    """
     # Get predictions.
     y_pred = model.predict(X_test)
 
@@ -58,10 +78,17 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """Saves the classifier to a binary file.
+
+    Arguments:
+        model -- the classifier.
+        model_filepath -- the file to save the classifier to.
+    """
     pickle.dump(model, open(model_filepath, 'wb'))
 
-
 def main():
+    """Runs the training script.
+    """
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
